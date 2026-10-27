@@ -1,0 +1,33 @@
+{
+  "name": "books-api",
+  "version": "1.0.0",
+  "description": "A webservice that works with books",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon --env-file=.env server.js",
+    "start":"node --env-file=.env server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baironcayetano/books-api.git"
+  },
+  "keywords": [
+    "api",
+    "webservice",
+    "json"
+  ],
+  "author": "baironcayetano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/baironcayetano/books-api/issues"
+  },
+  "homepage": "https://github.com/baironcayetano/books-api#readme",
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
