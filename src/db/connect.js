@@ -12,7 +12,13 @@ const connectToDb = async () => {
     const client = new MongoClient(connectionString);
     await client.connect();
 
-    database = client.db(process.env.MONGO_DB_NAME || "practice");
+    const dbName = process.env.MONGO_DB_NAME;
+    
+    if(!dbName){
+        throw new Error("The MONGO_DB_NAME variable is not defined in the .env file")
+    } 
+
+    database = client.db(dbName);
     return database;
 }
 
