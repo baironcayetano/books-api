@@ -4,7 +4,7 @@ const getBooksHandler = async (req, res) => {
 	try{
 		const books = await getAllBooks();
 		return res.status(200).json(books);
-	}catch{
+	}catch(error){
 		console.error("Failed to retreive books: ", error.message);
 		return res.status(500).json({message:"Internal Server Error"});
 	}	
