@@ -134,9 +134,9 @@ Author object:
 Authors will continue to use custom string ids instead of MongoDB `_id` values for route parameters.
 
 ### Relationship to Books
-Each book will identify its author with an `authorId` field. The value of `authorId` must match the custom `id` value of an existing author document.
+Each book will identify its author with an `authorId` field. The value of `authorId` must match the custom `id` value of an existing author document
 
-When creating or updating a book, the API should reject the request with a `400` status code if the submitted `authorId` does not match an existing author.
+When an author is deleted, all the Books with a reference to that author should be deleted.
 
 ## Endpoints
 
