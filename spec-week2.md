@@ -1,4 +1,7 @@
-# Books API Week 02 Spec - Version 1 
+# Books API Week 02 Spec - Version 2 
+
+## Purpose
+Build a Books API in Express with support for CRUD operations, and with mongoDB storage.
 
 ## Feature 1: Book CRUD Operations and Author References
 
@@ -7,13 +10,13 @@ Update the existing week 01 book API so book documents include a reference
 to an author and the API supports all CRUD operations for books. Every book route must be documented and testable in Swagger.
 
 ### Data Model 
-Book documents will be stored in the `books` collection.
+MongoDB database: `cse341-books-db`. MongoDB collection: `books`.
 
-Required book fields:
-- `id`: string, required, custom id such as `b1`
-- `authorId`: string, required, references the `id` field of an author document
-- `title`: string, required
-- `publicationDate`: string, required
+Book object:
+- `id`: string (required)
+- `authorId`: string (required) (references `id` from a Author document in collection `authors`)
+- `title`: string (required)
+- `publicationDate`: string in ISO 8601 date format (for example, "2021-08-17") (required)
 
 Books will continue to use custom string ids instead of MongoDB `_id` values for route parameters.
 
@@ -22,33 +25,45 @@ Each book will identify its author with an `authorId` field. The value of `autho
 
 When creating or updating a book, the API should reject the request with a `400` status code if the submitted `authorId` does not match an existing author.
 
-### Routes
+## Endpoints
+1. GET `/books`
+- Description: Return all books 
+- Success Status: `200`
+- Error Status: `500`
+- Success response body example:
 
-#### GET /books 
-Purpose: Return all books.
+    [{
+		"id": "b1",
+		"authorId": "a1",
+		"title": "Pattern of Light",
+		"publicationData": "2021-08-17"
+	}]
 
-Succes: 
-- Status code: `200`
-- Response body: an array of objects
+2. GET `/books/:id`
+- Description: Return one book by id.
+- Success Status: `200`
+- Not Found Status: `404`
+- Error Status: `500`
+- Success Response Body Example:
 
-Errors:
-- `500` if an unexpected server or database error occurs
+    {
+        "id": "b1",
+        "authorId": "a1",
+	    "title": "Pattern of Light",
+	    "publicationDate": "2021-08-17"
+    } 
 
-#### GET /books/:id
-Purpose: Return one book by its custom id.
+- Not Found Response Body Example:
 
-Success: 
-- Status code: `200`
-- Response body: the matching book object 
+    {"message": "Book not found"}
 
-- Errors
-- `404` if no book exists with that id
-- `500` if an unexpected server or database error occurs
+3. POST `/books`
+- Description: Create a new book
+- Success Status: `201`
+- Bad Request Status: `400`
+- Errors Status: `500`
 
-#### POST /books
-Purpose: Create a new book
-
-Request body:
+- Request Body Example:
 
     {
         "id": "b4",
@@ -57,20 +72,21 @@ Request body:
         "publicationDate": "2026-01-15"
     }
 
-Success:
-- Status code: `201`
-- Response body: the newly created book object
+- Sucess Response Body Example (the new created object):
+    {
+        "id": "b4",
+        "authorId": "a1",
+        "title": "Example Book Title",
+        "publicationDate": "2026-01-15"
+    }
 
-Errors:
-- `400` if a required field is missing
-- `400` if the `id` already exists 
-- `400` if the `authorId` does not match an existing author
-- `500` if an unexpected server or database error occurs
-
-#### PUT /books/:id
-Purpose: Update an existing book
-
-Request body:
+4. PUT `/books/:id`
+- Description: Update an existing book by its id
+- Success Status: `200`
+- Bad Request Status: `400`
+- Not Found Status: `404`
+- Error Status: `500`
+- Request Body Example:
 
     {
         "authorId": "a2",
@@ -78,45 +94,42 @@ Request body:
         "publicationDate": "2026-02-20"
     }
 
-Success:
-- Status code: `200`
-- Response body: the updated book object
+- Sucess Response Body Example (the updated book object):
 
-Errors:
-- `400` if a required field is missing
-- `400` if the `authorId` does not match an existing author
-- `404` if no book exists with that id
-- `500` if an unexpected server or database error occurs
+    {
+        "id": "b4",
+        "authorId": "a1",
+        "title": "Example Book Title",
+        "publicationDate": "2026-01-15"
+    }
 
-#### DELETE /books/:id
-Purpose: Delete an existing book.
+- Not Found Response Body Example:
 
-Success: 
-- Status code: `204`
-- Response body: none
+    { "message": "Book not found"}
 
-Errors:
-- `404` if no book exists with that id
-- `500` if an unexpected server or database error occurs
 
-### Swagger Documentation 
-Swagger must document every book route.
+5. DELETE `/books/:id`
+- Description: Delete an existing book by its id
+- Success Status: `204`
+- Not Found Status: `404`
+- Error Status: `500`
+- Success Response Body: none
+- Not Found Response Body Example:
 
-### Deployment Expectations
-After implementation, the book routes must work locally and from the deployed Render application. The deployed Swagger page at `/api-docs` must allow someone to test every book route from the browser.
+    { "message": "Book not found"}
 
 ## Feature 2: Author CRUD Operations 
 
 ### Goal
-Update the existing API to include a collection `author` that stores the author `id`s, `name`s and `birthYear`s. The new endpoints for the author collection should support all CRUD operations. Every route must be documented and testable in Swagger.
+Update the existing API to include a collection `authors` that stores the author `id`s, `name`s and `birthYear`s. The new endpoints for the author collection should support all CRUD operations. Every route must be documented and testable in Swagger.
 
 ### Data Model
-Author documents will be stored in the `author` collection.
+MongoDB database: `cse341-books-db`. MongoDB collection: `authors`.
 
-Required author fields:
-- `id`: string, required, custom id such as `b1`. 
-- `name`: string, required.
-- `birthYear`: string, required.
+Author object:
+- `id`: string (required)
+- `name`: string (required)
+- `birthYear`: string in ISO 8601 date format (for example, "1998-08-17") (required)
 
 Authors will continue to use custom string ids instead of MongoDB `_id` values for route parameters.
 
@@ -125,81 +138,115 @@ Each book will identify its author with an `authorId` field. The value of `autho
 
 When creating or updating a book, the API should reject the request with a `400` status code if the submitted `authorId` does not match an existing author.
 
-### Routes
+## Endpoints
 
-#### GET /authors 
-Purpose: Return all authors.
+1. GET `/authors`
+- Description: Return all authors 
+- Success Status: `200`
+- Error Status: `500`
+- Success response body example:
 
-Succes: 
-- Status code: `200`
-- Response body: an array of objects
+    [{
+		"id": "a1",
+		"name": "John Example",
+		"birthYear": "1998-08-17"
+	}]
 
-Errors:
-- `500` if an unexpected server or database error occurs
+2. GET `/authors/:id`
+- Description: Return one author by its custom id.
+- Success Status: `200`
+- Not Found Status: `404`
+- Error Status: `500`
+- Success Response Body Example:
 
-#### GET /authors/:id
-Purpose: Return one book by its custom id.
+    {
+        "id": "a1",
+        "name": "John Example",
+	    "birthYear": "1998-08-17"
+    } 
 
-Success: 
-- Status code: `200`
-- Response body: the matching author object 
+- Not Found Response Body Example:
 
-- Errors
-- `404` if no author exists with that id
-- `500` if an unexpected server or database error occurs
+    {"message": "Author not found"}
 
-#### POST /authors
-Purpose: Create a new author
 
-Request body:
+3. POST `/authors`
+- Description: Create a new author
+- Success Status: `201`
+- Bad Request Status: `400`
+- Error Status: `500`
+- Request body example (the newly created author object):
 
+    {
+        "name": "John Example",
+        "birthYear": "2026-01-15",
+    }
+
+- Sucess response body example (the newly created author object):
+  
     {
         "id": "b4",
         "name": "John Example",
         "birthYear": "2026-01-15",
     }
 
-Success:
-- Status code: `201`
-- Response body: the newly created author object
-
-Errors:
-- `400` if a required field is missing
-- `400` if the `id` already exists 
-- `500` if an unexpected server or database error occurs
-
-#### PUT /authors/:id
-Purpose: Update an existing author
-
-Request body:
+4. PUT `/authors/:id`
+- Description: Update an existing author by its custom id.
+- Success Status: `200`
+- Bad Request Status: `400`
+- Not Found Status: `404`
+- Error Status: `500`
+- Request body example:
 
     {
         "name": "John Example",
-        "birthYear": "2026-02-20"
+        "birthYear": "1998-02-20"
+    }
+- Sucess response body example (the new updated author object): 
+    {
+        "id": "a1",
+        "name": "John Example",
+        "birthYear": "1998-02-20"
     }
 
-Success:
-- Status code: `200`
-- Response body: the updated author object
+- Not Found Response Body Example:
 
-Errors:
-- `400` if a required field is missing
-- `404` if no author exists with that id
-- `500` if an unexpected server or database error occurs
+    {"message": "Author not found"}
 
-#### DELETE /authors/:id
-Purpose: Delete an existing author.
+5. DELETE  `/authors/:id`
+- Description: Delete an existing author by its custom id.
+- Success Status: `204`
+- Not Found Stauts: `404`
+- Error Status: `500`
+- Success response body: `none`
+- Not Found response body example:
 
-Success: 
-- Status code: `204`
-- Response body: none
+    { "message": "Author not found"}
 
-Errors:
-- `404` if no author exists with that id
-- `500` if an unexpected server or database error occurs
+
+## Bad Request Handling
+- Return simple messages for 400 errors:
+{
+    "message": "Bad request. Invalid data"
+}
+
+## Error Handling 
+- Do not return stack traces to clients.
+- Return a simple message for 500 errors:
+{
+	"message": "Internal server error"
+}
 
 ### Swagger Documentation 
-Swagger must document every author route.
+Swagger must document every book and author route.
 
 ### Deployment Expectations
 After implementation, the book routes must work locally and from the deployed Render application. The deployed Swagger page at `/api-docs` must allow someone to test every book route from the browser.
+
+## Implementation Notes
+- Use two MongoDB collections named "books" and "authors".
+- Seed the collections with the book and author documents needed for testing 
+- Use enviroment variables for the MongoDB connection.
+
+## Out of Scope for Week 2
+- Authentication and authorization
