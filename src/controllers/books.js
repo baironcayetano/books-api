@@ -3,7 +3,7 @@ import { createBook, deleteBookById, getAllBooks, getBookById, updateBookById } 
 const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 //Error Messages
-const INVALID_REQ = "Bad request. Invalid Data";
+const BAD_REQ = "Bad request. Invalid Data";
 const NOT_FOUND = "Book not found";
 const SERVER_ERR = "Internal Server Error"; 
 
@@ -13,11 +13,11 @@ const postBooksHandler = async (req, res) => {
 
 		//[Validate book entries]
 		if(!book.id || !book.authorId || !book.title || !book.publicationDate){
-			return res.status(400).json({message: INVALID_REQ})
+			return res.status(400).json({message: BAD_REQ})
 		}
 		//validate date
 		if(!isoRegex.test(book.publicationDate)){
-			return res.status(400).json({message: INVALID_REQ})
+			return res.status(400).json({message: BAD_REQ})
 		}
 
 		await createBook(book);
@@ -29,9 +29,9 @@ const postBooksHandler = async (req, res) => {
 		//so that attackers don't get adventage or these response messages 
 		switch (error.message) {
 			case "duplicated custom id":
-				return res.status(400).json({message: INVALID_REQ});
+				return res.status(400).json({message: BAD_REQ});
 			case "author does not exist":
-				return res.status(400).json({message: INVALID_REQ});
+				return res.status(400).json({message: BAD_REQ});
 			//server errors
 			default:
 				//log error
@@ -75,17 +75,17 @@ const putBookByIdHandler = async (req, res) => {
 	try{
 		//validate if the the book has at least one valid entry 
 		if(!book.authorId && !book.title && !book.publicationDate){
-			return res.status(400).json({message: INVALID_REQ})
+			return res.status(400).json({message: BAD_REQ})
 		}
 
 		//validate date (if exists)
 		if(book.publicationDate && !isoRegex.test(book.publicationDate)){
-			return res.status(400).json({message: INVALID_REQ})
+			return res.status(400).json({message: BAD_REQ})
 		}
 
 		const updatedBook = await updateBookById(bookId, book);
 		if(updatedBook && updatedBook.matchedCount === 0){
-			return res.status(404).json({ message: NOT_FOUND })
+			return res.status(404).json({ message: BAD_FOUND })
 		}
 
 		return res.status(200).json(book);
@@ -95,7 +95,7 @@ const putBookByIdHandler = async (req, res) => {
 		//the message returned to the user should be simple
 		//so that attackers don't get adventage or these response messages 
 		if(error.message === "author does not exist"){
-			return res.status(400).json({message: INVALID_REQ}); 
+			return res.status(400).json({message: BAD_REQ}); 
 		}
 		
 		console.error("Failed to retreive books", error.message);
